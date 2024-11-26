@@ -1,7 +1,7 @@
 require 'sketchup.rb'
 
-SCRIPTS_DIR = "/Users/robindeits/Projects/ScratchHolograms"
-PYTHON_PATH = "/usr/local/bin/python"
+SCRIPTS_DIR = "/Users/sasha/Documents/ScratchHolograms"
+PYTHON_PATH = "/usr/local/bin/python3"
 
 IMAGE_SIZE_IN = 4
 VIEWING_HEIGHT_IN = 24
@@ -45,7 +45,8 @@ def dumpPoint( point, trans )
 		  return
 	  end
   end
-  @plotted_points.insert(pos)
+  #@plotted_points.insert(pos)
+  @plotted_points.add(pos)
   arc_on = false
 
   view_pos = @view_start_pos
@@ -108,7 +109,7 @@ end
 
 #--------------------------------------------------------------------------
 def DumpGroup( entity, etrans, trans, name )
-	@plotted_points = Set.new()
+  @plotted_points = Set.new()
   subtrans = combineTransformation( trans, etrans )
 
   @points = []
@@ -226,7 +227,7 @@ def ExportPattern()
 	base_dir = File.dirname(filename)
 	scripts_dir = SCRIPTS_DIR
 	Dir.chdir(scripts_dir)
-	d = IO.popen(PYTHON_PATH + " draw_pattern.py " + base_dir + "/" + proposal)
+	d = IO.open(PYTHON_PATH + " draw_pattern.py " + base_dir + "/" + proposal)
 	puts "Data export done. Python results will appear as soon as they are completed"
 	while d.gets != nil
 		puts d.gets

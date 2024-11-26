@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 __author__ = "Robin Deits <robin.deits@gmail.com>"
 
-RESOLUTION = 60
+RESOLUTION = 120
 
 class PatternMaker:
     def __init__(self, filename, printers, 
@@ -19,7 +19,7 @@ class PatternMaker:
 
     def setup_common(self, filename, printers, image_width_in, viewing_height_in):
         self.filename = filename
-        self.reader = csv.reader(open(filename, 'rb'))
+        self.reader = csv.reader(open(filename, 'r'))
         self.printers = printers
         self.data = np.array([[float(i) for i in row] for row in self.reader])
         # print self.data
@@ -31,7 +31,11 @@ class PatternMaker:
         x_range = (np.max(self.data[:,0]) 
                 - np.min(self.data[:,0]) 
                 + 2*z_max)
+        #rescale
         self.data[:,:3] *= image_width_in / x_range
+        #offset
+        center=[(np.max(self.data[:,q])+np.min(self.data[:,q]))/2 for q in range(3)]
+        self.data[:,:3] -= center
 
     def print_pattern(self):
         num_points = len(self.data[:,0])
@@ -65,16 +69,16 @@ class PatternMaker:
             if self.data[i, 3] < point_angle < self.data[i,4]:
                 draw_angle = -point_angle + np.pi/2
                 view_printer.draw_point([x - z * np.cos(draw_angle),
-                         y + z - z * np.sin(draw_angle)], marker = '*', 
+                         y + z - z * np.sin(draw_angle)], marker = '*',
                          # y - z * np.sin(draw_angle)], marker = '*', 
-                                        color = 'k')
+                                        markersize = 0.1,color = 'k')
         view_printer.save(os.path.splitext(self.filename)[0] 
                           + "_view_" + ("%+3d" %(angle * 180/np.pi)).strip())
 
     def draw_views(self, angle):
         for printer in self.printers:
             if isinstance(printer, DXFPrinter):
-                print "DXFPrinter can't draw perspective views, aborting"
+                print("DXFPrinter can't draw perspective views, aborting")
                 continue
             self.draw_view(angle)
             self.draw_view(-angle)
